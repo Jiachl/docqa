@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Chart.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: container
+          image: "asiainnovationlab.docker.pkg.sehlat.io/{{ .Chart.Name }}:{{ .Chart.Version }}"
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+            requests:
+              memory: "128Mi"
+              cpu: "0.1"
+          env:
+          - name: OPENAI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: openapi
+                key: api-key
+          - name: DEPLOYMENT_PLATFORM
+            value: "k8s"
